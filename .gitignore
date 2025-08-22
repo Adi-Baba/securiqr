@@ -1,0 +1,27 @@
+# Byte-compiled and cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.Python
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Log and secret key files
+*.log
+*.key
+
+# Example script outputs
+examples/output/
+examples/advanced_output/
+
+# OS-generated files
+.DS_Store
