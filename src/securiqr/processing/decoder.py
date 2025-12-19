@@ -5,7 +5,7 @@ from typing import Optional, Tuple, List
 
 import numpy as np
 from PIL import Image
-from pyzbar import pyzbar
+from PIL import Image
 
 from ..core.common import DualAuthBarcode
 
@@ -28,6 +28,7 @@ class BarcodeDecoder:
             img = img.resize((img.width * self.scale, img.height * self.scale), Image.NEAREST)
         
         try:
+            from pyzbar import pyzbar
             decoded_objects = pyzbar.decode(img)
             if decoded_objects:
                 return decoded_objects[0].data.decode('utf-8')
@@ -190,9 +191,13 @@ class BarcodeDecoder:
     def read_standard_barcodes(image_path: str) -> Optional[List]:
         """Reads any standard barcodes from an image file."""
         try:
+            from pyzbar import pyzbar
             img = Image.open(image_path)
             decoded_objects = pyzbar.decode(img)
             return decoded_objects if decoded_objects else None
+        except ImportError:
+             logger.error("Could not import pyzbar. Is the 'zbar' shared library installed?")
+             return None
         except Exception as e:
             logger.error(f"Error reading standard barcodes: {e}")
             return None
