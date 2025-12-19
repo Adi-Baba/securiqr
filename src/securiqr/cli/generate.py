@@ -1,7 +1,7 @@
 import os
 import argparse
 import logging
-from ..core.generator import BarcodeGenerator
+from ..core.engine import SecuriQREngine
 
 def main():
     """Command-line interface for generating SecuriQR barcodes."""
@@ -19,16 +19,34 @@ def main():
     logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s - %(message)s')
     
     # Generate the barcode
-    generator = BarcodeGenerator(args.key)
-    barcode, data_matrix, version, eclevel, mask = generator.create_barcode(
-        args.public_data, args.secret
-    )
-    
+    try:
+        engine = SecuriQREngine(args.key)
+        barcode, data_matrix, version, eclevel, mask = engine.create_barcode(
+            args.public_data, args.secret
+        )
+    except FileNotFoundError:
+        print(f"Error: Private key file not found at '{args.key}'.")
+        print("Please generate keys first using: from securiqr.core.crypto import CryptoManager; CryptoManager().generate_key_pair('keys')")
+        return 1
+    except ValueError as e:
+        print(f"Error: {e}") 
+        return 1
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return 1
+
     # Save the composite barcode
     output_path = os.path.join(args.output, "composite_barcode.png")
-    success = generator.generate_composite_barcode(
-        barcode, data_matrix, output_path, version, eclevel, mask
-    )
+    try:
+        success = engine.generate_composite_barcode(
+            barcode, data_matrix, output_path, version, eclevel, mask
+        )
+    except OSError as e:
+        print(f"Error saving file to '{output_path}': {e}")
+        return 1
+    except PermissionError:
+        print(f"Error: Permission denied when trying to save to '{output_path}'. Check directory permissions.")
+        return 1
     
     if success:
         print(f"Successfully generated SecuriQR barcode at: {output_path}")

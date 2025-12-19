@@ -14,7 +14,7 @@ setup(
     description="A dual-layer authenticated barcode system for secure product verification",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/securiqr",
+    url="https://github.com/Adi-Baba/securiqr",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     classifiers=[
@@ -35,7 +35,7 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "securiqr-generate=securiqr.cli.generate:main",
+            "securiqr-gen=securiqr.cli.generate:main",
             "securiqr-verify=securiqr.cli.verify:main",
             "securiqr-read=securiqr.cli.universal_reader:main",
         ],

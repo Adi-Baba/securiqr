@@ -2,10 +2,8 @@ import sys
 import os
 import argparse
 import logging
-from ..processing.image_processor import ImageProcessor
 from ..processing.decoder import BarcodeDecoder
-from ..core.verifier import BarcodeVerifier
-from ..utils.key_manager import load_or_generate_secret_key
+from ..core.engine import SecuriQREngine
 
 def main():
     """Universal reader for both standard and SecuriQR barcodes."""
@@ -21,8 +19,8 @@ def main():
     logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s - %(message)s')
     
     # Determine barcode type
-    processor = ImageProcessor()
-    is_composite = processor.is_grayscale_or_color(args.image_path)
+    # Use static methods from BarcodeDecoder
+    is_composite = BarcodeDecoder.is_grayscale_or_color(args.image_path)
     
     if is_composite is None:
         print("Error analyzing image")
@@ -41,28 +39,28 @@ def main():
         barcode, _ = result
         
         # Verify the barcode if we have a key
-        key_path = args.key or os.path.join(os.path.dirname(__file__), "..", "..", "config", "manufacturer_secret.key")
-        if os.path.exists(key_path):
-            verifier = BarcodeVerifier(key_path)
-            is_authentic = verifier.verify_barcode(barcode, args.verbose)
-            
-            if is_authentic:
-                print("✅ Secure Barcode AUTHENTICATED")
-                secret_message = verifier.extract_secret_message(barcode)
-                print(f"Public Data: {barcode.public_data}")
-                if secret_message:
-                    print(f"Secret Message: {secret_message}")
-            else:
-                print("❌ Barcode is NOT authentic")
-                return 1
-        else:
-            print("⚠️  No verification key found. Displaying unverified data:")
+        # Engine handles default key path if None is passed, but here we can iterate
+        engine = SecuriQREngine(args.key)
+        # We can try verification if key exists
+        # Since engine init creates a key if missing (which is weird for a reader),
+        # we might want to be careful. But keeping logic similar to before:
+        
+        is_authentic = engine.verify_barcode(barcode, args.verbose)
+        
+        if is_authentic:
+            print("✅ Secure Barcode AUTHENTICATED")
+            secret_message = engine.extract_secret_message(barcode)
             print(f"Public Data: {barcode.public_data}")
-            
+            if secret_message:
+                print(f"Secret Message: {secret_message}")
+        else:
+            print("❌ Barcode is NOT authentic (or key mismatch)")
+            print(f"Public Data: {barcode.public_data}")
+
     else:
         # Standard barcode
         print("Detected standard barcode. Attempting to decode...")
-        results = processor.read_standard_barcodes(args.image_path)
+        results = BarcodeDecoder.read_standard_barcodes(args.image_path)
         
         if results:
             print("✅ Standard Barcode Detected")

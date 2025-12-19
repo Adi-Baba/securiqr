@@ -1,7 +1,7 @@
 import argparse
 import logging
 from ..processing.decoder import BarcodeDecoder
-from ..core.verifier import BarcodeVerifier
+from ..core.engine import SecuriQREngine
 
 def main():
     """Command-line interface for verifying SecuriQR barcodes."""
@@ -27,12 +27,22 @@ def main():
     barcode, _ = result
     
     # Verify the barcode
-    verifier = BarcodeVerifier(args.key)
-    is_authentic = verifier.verify_barcode(barcode, args.verbose)
+    try:
+        engine = SecuriQREngine(args.key)
+        is_authentic = engine.verify_barcode(barcode, args.verbose)
+    except FileNotFoundError:
+        print(f"Error: Public key file not found at '{args.key}'.")
+        return 1
+    except ValueError as e:
+        print(f"Error: {e}. Ensure you are using the correct Public Key.")
+        return 1
+    except Exception as e:
+        print(f"Unexpected error during verification: {e}")
+        return 1
     
     if is_authentic:
         print("✅ Barcode is AUTHENTIC")
-        secret_message = verifier.extract_secret_message(barcode)
+        secret_message = engine.extract_secret_message(barcode)
         if secret_message:
             print(f"Secret message: {secret_message}")
     else:

@@ -73,7 +73,61 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 *(Note: A `requirements.txt` file would need to be created for this command to work.)*
+### 1. Prerequisites (ZBar)
+This project depends on `pyzbar`, which requires the native `zbar` library to be installed on your system.
 
+*   **Windows**: 
+    *   No action usually required (DLLs included in `pyzbar`).
+    *   If you see DLL errors, install the [Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+*   **macOS**:
+    ```bash
+    brew install zbar
+    ```
+*   **Linux (Ubuntu/Debian)**:
+    ```bash
+    sudo apt-get install libzbar0
+    ```
+
+### 2. Install Package
+You can install SecuriQR directly from GitHub:
+
+```bash
+pip install git+https://github.com/Adi-Baba/securiqr.git
+```
+Or if you have properly cloned it locally:
+```bash
+pip install .
+```
+
+## Quick Usage
+
+SecuriQR installs three command-line tools:
+
+### Generate Keys
+First, generate your ECDSA key pair (Private/Public keys).
+```python
+from securiqr.core.crypto import CryptoManager
+cm = CryptoManager()
+cm.generate_key_pair("keys")
+```
+
+### Generate Code
+Create a secure barcode signed with your **Private Key**.
+```bash
+securiqr-gen "Product-123" -s "SecretFabricData" -k keys/private.pem
+```
+
+### Verify Code
+Verify a barcode using the **Public Key**. safe for distribution to field agents.
+```bash
+securiqr-verify output/composite_barcode.png -k keys/public.pem
+```
+
+### Universal Reader
+Read standard QR codes or SecuriQR codes.
+```bash
+securiqr-read path/to/image.png -k keys/public.pem
+```    
 ## Basic Usage
 
 The following example demonstrates the end-to-end process of generating a SecuriQR code, saving it, and then verifying its authenticity.
