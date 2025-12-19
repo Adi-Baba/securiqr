@@ -1,6 +1,13 @@
-# SecuriQR: Dual-Layer Authenticated QR Codes
+# SecuriQR
 
+[![PyPI version](https://badge.fury.io/py/securiqr.svg)](https://badge.fury.io/py/securiqr)
+[![Python Versions](https://img.shields.io/pypi/pyversions/securiqr.svg)](https://pypi.org/project/securiqr/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Security: ECDSA](https://img.shields.io/badge/Security-ECDSA%20P--256-brightgreen)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm)
+[![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)](https://github.com/Adi-Baba/securiqr)
+
+**Dual-Layer Authenticated Barcode System**
 
 SecuriQR is a Python library for generating and verifying dual-layer, cryptographically signed QR codes. It enhances standard QR codes by embedding a second, hidden layer containing a digital signature, making them resistant to simple duplication and providing a robust method for product authentication.
 
