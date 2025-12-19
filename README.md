@@ -108,6 +108,10 @@ pip install .
 
 ## Quick Usage
 
+> **⚠️ Google Colab / Jupyter Notebook Users:**  
+> When running these commands in a notebook cell, you must add an exclamation mark `!` at the beginning.  
+> Example: `!securiqr-gen ...`
+
 SecuriQR installs three command-line tools:
 
 ### Generate Keys
