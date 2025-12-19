@@ -54,8 +54,8 @@ graph TD
 
 ## Core Components
 
-- **`BarcodeGenerator`**: Creates signed, dual-layer QR codes. It handles data padding, key derivation, and composite image generation.
-- **`BarcodeVerifier`**: Verifies the authenticity of a decoded barcode. It reconstructs the expected signature and compares it against the provided one.
+- **`SecuriQREngine`**: Using ECC keys, handles both the generation of signed barcodes (Private Key) and verification (Public Key).
+- **`CryptoManager`**: Manages ECDSA key generation, loading, and cryptographic operations.
 - **`BarcodeDecoder`**: Reads a composite grayscale image, separates the two layers, and decodes the raw public data and signature.
 
 ## Installation
@@ -148,8 +148,13 @@ import os
 from pathlib import Path
 
 # Assuming the library is in the python path
-from securiqr.core.generator import BarcodeGenerator
-from securiqr.core.verifier import BarcodeVerifier
+```python
+import os
+from pathlib import Path
+
+# Assuming the library is in the python path
+from securiqr.core.engine import SecuriQREngine
+from securiqr.core.crypto import CryptoManager
 from securiqr.processing.decoder import BarcodeDecoder
 
 def main():
@@ -158,13 +163,20 @@ def main():
     # 1. Setup
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)
-    key_path = output_dir / "secret.key"
+    keys_dir = Path("keys")
+    
+    # We need keys first!
+    if not keys_dir.exists():
+        print("Generating new keys...")
+        cm = CryptoManager()
+        cm.generate_key_pair(str(keys_dir))
+
+    private_key_path = keys_dir / "private.pem"
+    public_key_path = keys_dir / "public.pem"
     barcode_path = output_dir / "my_product_barcode.png"
     
-    # Initialize components with a path to the master key.
-    # The key will be created if it doesn't exist.
-    generator = BarcodeGenerator(str(key_path))
-    verifier = BarcodeVerifier(str(key_path))
+    # Initialize Engine with Private Key for Generation
+    engine_gen = SecuriQREngine(str(private_key_path))
     decoder = BarcodeDecoder()
     
     # 2. Generation
@@ -174,12 +186,12 @@ def main():
     print(f"Generating barcode for: {public_data}")
     
     # Create the in-memory barcode data and its visual matrix
-    barcode, data_matrix, version, ec, mask = generator.create_barcode(
+    barcode, data_matrix, version, ec, mask = engine_gen.create_barcode(
         public_data, secret_message
     )
     
     # Generate and save the final composite grayscale image
-    generator.generate_composite_barcode(
+    engine_gen.generate_composite_barcode(
         barcode, data_matrix, str(barcode_path), version, ec, mask
     )
     
@@ -196,21 +208,24 @@ def main():
 
     decoded_barcode, _ = result
     
+    # Initialize Engine with PUBLIC Key for Verification
+    # (In a real app, the client only has the public key)
+    engine_ver = SecuriQREngine(str(public_key_path))
+
     # Verify the authenticity of the decoded data
-    is_authentic = verifier.verify_barcode(decoded_barcode)
+    is_authentic = engine_ver.verify_barcode(decoded_barcode)
     
     if is_authentic:
         print("✅ Barcode is AUTHENTIC.")
         # Extract the secret message from the verified code
-        secret = verifier.extract_secret_message(decoded_barcode)
+        secret = engine_ver.extract_secret_message(decoded_barcode)
         print(f"   Secret message: '{secret}'")
     else:
         print("❌ Barcode is NOT authentic.")
 
 if __name__ == "__main__":
     main()
-
-```
+`````
 
 ## Advanced Usage
 
