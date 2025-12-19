@@ -144,15 +144,7 @@ securiqr-read path/to/image.png -k keys/public.pem
 The following example demonstrates the end-to-end process of generating a SecuriQR code, saving it, and then verifying its authenticity.
 
 ```python
-import os
-from pathlib import Path
 
-# Assuming the library is in the python path
-```python
-import os
-from pathlib import Path
-
-# Assuming the library is in the python path
 from securiqr.core.engine import SecuriQREngine
 from securiqr.core.crypto import CryptoManager
 from securiqr.processing.decoder import BarcodeDecoder
@@ -225,7 +217,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-`````
+```
 
 ## Advanced Usage
 
