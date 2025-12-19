@@ -95,6 +95,13 @@ This project depends on `pyzbar`, which requires the native `zbar` library to be
     sudo apt-get install libzbar0
     ```
 
+### ☁️ Google Colab / Linux Notebooks
+If you are running on Google Colab, you **must** install the system dependency first. Run this in a code cell:
+```python
+!sudo apt-get install libzbar0
+!pip install git+https://github.com/Adi-Baba/securiqr.git
+```
+
 ### 2. Install Package
 You can install SecuriQR directly from GitHub:
 
